@@ -4,6 +4,7 @@ import Profile from './components/profile/profile';
 import Projects from './components/projects/projects';
 import Experiences from './components/experiences/experiences';
 import About from './components/about/about'
+import Chat from './components/chat/chat'
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <>
             <NavBar />
             <Profile />
+            <Chat />
             <About />
             <div id="projects" style={{ backgroundColor: bgColor, transition: 'background-color 0.3s ease' }}>
                 <h2>Projects</h2>
