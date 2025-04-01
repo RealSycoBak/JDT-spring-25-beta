@@ -3,9 +3,16 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
+import { MongoClient } from 'mongodb'
 
 dotenv.config();
 const API_KEY = process.env.API_KEY;
+const mongourl = process.env.MONGO_URL;
+const mongoclient = new MongoClient(mongourl, {})
+
+mongoclient.connect().then(()=> {
+    console.log("Connected to MongoDB")
+})
 
 const app = express()
 app.use(cors())
@@ -35,4 +42,29 @@ app.post('/chat', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
+})
+
+app.get('/logs', async (req, res) =>{
+    try{
+        const logs = await mongoclient.db('jdt-website').collection('logs').find({}).toArray()
+        res.status(200).json(logs)
+    } catch(error){
+        console.error(error)
+        res.status(500).json({message: 'Error'})
+    }
+})
+
+app.post('/add', async (req, res) =>{
+    try{
+        const log = req.body
+        if(!log.input || !log.response || Object.keys(log).length !== 2){
+            res.status(400).json({message: 'Bad Request'})
+            return;
+        }
+        await mongoclient.db('jdt-website').collection('logs').insertOne(log)
+        res.status(201).json({message: 'Success'})
+    } catch(error){
+        console.error(error)
+        res.status(500).json({message: 'Error'})
+    }
 })
