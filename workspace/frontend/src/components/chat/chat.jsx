@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 export default function Chat(){
     const [messages, setMessages] = useState([])
-    const [userInput, setUserInput] = useState('')
+    const [userInput, setUserInput] = useState("")
 
     async function getResponse(){
         try {
@@ -28,7 +28,18 @@ export default function Chat(){
 
     return (
         <div id="chat">
-            <p>Placeholder</p>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <h2>Ask a question</h2>
+                <input type="text" name="questionInput" placeholder="What would you like to ask?" onChange={e => setUserInput(e.target.value)} />
+                <button onClick={ getResponse }>Submit</button>
+            </form>
+            {
+                messages.map((text, index) => (
+                    <div key={index} className="chatBox">
+                        <p className={index%2==0? 'user-message' : 'chatbot-response'}>{text}</p>
+                    </div>
+                ))
+            }
         </div>
     )
 }
