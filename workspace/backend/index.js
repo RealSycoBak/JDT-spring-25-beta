@@ -10,7 +10,7 @@ const API_KEY = process.env.API_KEY;
 const mongourl = process.env.MONGO_URL;
 const mongoclient = new MongoClient(mongourl, {})
 
-mongoclient.connect().then(()=> {
+mongoclient.connect().then(() => {
     console.log("Connected to MongoDB")
 })
 
@@ -32,7 +32,7 @@ app.post('/chat', async (req, res) => {
     try {
         const result = await model.generateContent(userInput);
         responseMessage = result.response.text();
-    } catch(e){
+    } catch (e) {
         responseMessage = 'Oops, something went wrong!'
     }
     res.json({
@@ -44,27 +44,42 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
 
-app.get('/logs', async (req, res) =>{
-    try{
+app.get('/logs', async (req, res) => {
+    try {
         const logs = await mongoclient.db('jdt-website').collection('logs').find({}).toArray()
         res.status(200).json(logs)
-    } catch(error){
+    } catch (error) {
         console.error(error)
-        res.status(500).json({message: 'Error'})
+        res.status(500).json({ message: 'Error' })
     }
 })
 
-app.post('/add', async (req, res) =>{
-    try{
+app.post('/add', async (req, res) => {
+    try {
         const log = req.body
-        if(!log.input || !log.response || Object.keys(log).length !== 2){
-            res.status(400).json({message: 'Bad Request'})
+        if (!log.input || !log.response || Object.keys(log).length !== 2) {
+            res.status(400).json({ message: 'Bad Request' })
             return;
         }
         await mongoclient.db('jdt-website').collection('logs').insertOne(log)
-        res.status(201).json({message: 'Success'})
-    } catch(error){
+        res.status(201).json({ message: 'Success' })
+    } catch (error) {
         console.error(error)
-        res.status(500).json({message: 'Error'})
+        res.status(500).json({ message: 'Error' })
+    }
+})
+
+app.post('/delete', async (req, res) => {
+    try {
+        const log = req.body
+        if (!log.input || !log.response || Object.keys(log).length !== 2) {
+            res.status(400).json({ message: 'Bad Request' })
+            return
+        }
+        await mongoclient.db('jdt-website').collection('logs').deleteOne(log)
+        res.status(201).json({ message: 'Success' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Error' })
     }
 })
